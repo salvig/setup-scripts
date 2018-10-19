@@ -9,7 +9,7 @@ GREEN="\033[0;32m"
 NC='\033[0m'
 MAG='\e[1;35m'
 
-. ./S1/$1.conf
+. ./$1/$1.conf
 
 function check_distro() {
 if [[ $(lsb_release -i) != *Ubuntu* ]]; then
@@ -234,37 +234,3 @@ function setup_node() {
 }
 
 setup_node
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
