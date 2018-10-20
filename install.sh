@@ -14,6 +14,7 @@ echo $COINS | grep $1 >/dev/null 2>&1
 if [ $? -eq 0 ]
  then . ./$1/$1.conf
  else echo "Such coin $1 is not supported"
+ echo "SUpported coins are: $(echo $COINS)"
  exit 1
 fi
 
