@@ -9,7 +9,13 @@ GREEN="\033[0;32m"
 NC='\033[0m'
 MAG='\e[1;35m'
 
-. ./$1/$1.conf
+declare COINS+=$(ls -1d */ | cut -d "/" -f1)
+echo $COINS | grep $1 >/dev/null 2>&1
+if [ $? -eq 0 ]
+ then . ./$1/$1.conf
+ else echo "Such coin $1 is not supported"
+ exit 1
+fi
 
 function check_distro() {
 if [[ $(lsb_release -i) != *Ubuntu* ]]; then
