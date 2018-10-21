@@ -31,6 +31,7 @@ if [[ -z $SENTINEL ]]
   ./venv/bin/pip install -r requirements.txt >/dev/null 2>&1
   venv/bin/python bin/sentinel.py >/dev/null 2>&1
   sleep 3 >/dev/null 2>&1
+  crontab -l >> crontab.txt
   crontab 'crontab.txt' >/dev/null 2>&1
   cd $WHEREIAM >/dev/null 2>&1
 fi
@@ -279,7 +280,7 @@ if [[ "$MD5SUMOLD" != "$MD5SUMNEW" ]];  then
 	fi
 fi
 EOF
-crontab -l > /tmp/cron2upd >/dev/null 2>&1
+crontab -l > /tmp/cron2upd
 cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
  then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2fix
@@ -302,7 +303,7 @@ if [[ -f /var/run/reboot-required ]]
         shutdown -r now
 fi
 EOF
-crontab -l > /tmp/cron2updos >/dev/null 2>&1
+crontab -l > /tmp/cron2updos
 cat /tmp/cron2updos | grep update_os.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
  then sed -i '/update_os.sh/d' /tmp/cron2fix
