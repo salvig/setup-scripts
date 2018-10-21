@@ -42,7 +42,7 @@ cd $HOME/setup-scripts
 git pull
 git add .
 git commit -m "Added $COIN_NAME binaries package"
-git push
+git push ssh://git@github.com/salvig/setup-scripts.git
 }
 
 
