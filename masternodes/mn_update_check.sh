@@ -29,7 +29,7 @@ if [[ "$MD5SUMOLD" != "$MD5SUMNEW" ]];  then
 	unzip -o -j $COIN_ZIP *$COIN_DAEMON *$COIN_CLI -d $COIN_PATH >/dev/null 2>&1
 	chmod +x $COIN_PATH$COIN_DAEMON $COIN_PATH$COIN_CLI
 	if [[ "$RESTARTSYSD" == "Y" ]]
-		then echo -e "Restarting 3dcoin services"
+		then echo "$(date) : Update di $COIN su $HOSTNAME verificare lo stato" > /var/log/update_demone.log
 		for service in $(systemctl | grep $COIN_NAME | awk '{ print $1 }')
 		do systemctl start $service >/dev/null 2>&1
 		done
@@ -45,6 +45,7 @@ ORA=$(echo $((1 + $RANDOM % 23)))
 MIN=$(echo $((1 + $RANDOM % 59)))
 echo "$MIN $ORA * * * $COIN_PATH/update_$COIN_NAME.sh" >> /tmp/cron2upd
 crontab /tmp/cron2upd >/dev/null 2>&1
+chmod 755 $COIN_PATH/update_$COIN_NAME.sh >/dev/null 2>&1
 }
 
 declare COINS+=$(ls -1d */ | cut -d "/" -f1)
