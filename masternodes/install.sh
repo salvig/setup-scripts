@@ -22,6 +22,7 @@ function sentinel() {
 if [[ -z $SENTINEL ]]
   then WHEREIAM=$(pwd) >/dev/null 2>&1
   cd >/dev/null 2>&1
+  apt-get -y install python-virtualenv >/dev/null 2>&1
   export LC_ALL="en_US.UTF-8" >/dev/null 2>&1
   export LC_CTYPE="en_US.UTF-8" >/dev/null 2>&1
   git clone $GITSENTINEL >/dev/null 2>&1
