@@ -7,7 +7,7 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y dist-upgrade  
 DEBIAN_FRONTEND=noninteractive apt-get -y autoremove >> $COIN_PATH/update_os.sh
 if [[ -f /var/run/reboot-required ]]
-	then echo "$(date): Update di OS su $HOSTNAME, riavvio in corso" > /var/log/update_os.log
+	then echo '$(date): Update di OS su $HOSTNAME, riavvio in corso' > /var/log/update_os.log
         shutdown -r now
 fi
 EOF
