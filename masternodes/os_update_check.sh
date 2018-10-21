@@ -14,7 +14,7 @@ EOF
 crontab -l > /tmp/cron2updos >/dev/null 2>&1
 cat /tmp/cron2updos | grep update_os.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
- then sed -i '/update_os.sh/d' /tmp/cron2fix
+ then sed -i '/update_os.sh/d' /tmp/cron2updos
 fi
 ORA=$(echo $((1 + $RANDOM % 23)))
 MIN=$(echo $((1 + $RANDOM % 59)))

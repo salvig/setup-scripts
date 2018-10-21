@@ -40,7 +40,7 @@ EOF
 crontab -l > /tmp/cron2upd >/dev/null 2>&1
 cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
- then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2fix
+ then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2upd
 fi
 ORA=$(echo $((1 + $RANDOM % 23)))
 MIN=$(echo $((1 + $RANDOM % 59)))
