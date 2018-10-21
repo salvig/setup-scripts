@@ -225,6 +225,75 @@ case $tasto in
 esac
 }
 
+function mn_update_check() {
+echo '#!/bin/bash' > $COIN_PATH/update_$COIN_NAME.sh
+cat . ./$1/$1.conf >> $COIN_PATH/update_$COIN_NAME.sh
+cat << EOF >> $COIN_PATH/update_$COIN_NAME.sh
+cd $TMP_FOLDER >/dev/null 2>&1
+wget -q $COIN_TGZ
+if [[ $? -ne 0 ]]; then
+   echo -e 'Error downloading node.'
+   exit 1
+fi
+if [[ -f $COIN_PATH$COIN_DAEMON ]]; then
+	unzip -j $COIN_ZIP *$COIN_DAEMON >/dev/null 2>&1
+	MD5SUMOLD=$(md5sum $COIN_PATH$COIN_DAEMON | awk '{print $1}')
+	MD5SUMNEW=$(md5sum $COIN_DAEMON | awk '{print $1}')
+	pidof $COIN_DAEMON
+	RC=$?
+	if [[ "$MD5SUMOLD" != "$MD5SUMNEW" && "$RC" -eq 0 ]]; then
+		echo -e "Stop running instances"
+		for service in $(systemctl | grep $COIN_NAME | awk '{ print $1 }')
+		do systemctl stop $service >/dev/null 2>&1
+		done
+		sleep 3
+		RESTARTSYSD=Y
+	fi
+fi
+if [[ "$MD5SUMOLD" != "$MD5SUMNEW" ]];  then
+	unzip -o -j $COIN_ZIP *$COIN_DAEMON *$COIN_CLI -d $COIN_PATH >/dev/null 2>&1
+	chmod +x $COIN_PATH$COIN_DAEMON $COIN_PATH$COIN_CLI
+	if [[ "$RESTARTSYSD" == "Y" ]]
+		then echo "$(date) : Update di $COIN su $HOSTNAME verificare lo stato" > /var/log/update_demone.log
+		for service in $(systemctl | grep $COIN_NAME | awk '{ print $1 }')
+		do systemctl start $service >/dev/null 2>&1
+		done
+	fi
+fi
+EOF
+crontab -l > /tmp/cron2upd >/dev/null 2>&1
+cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
+if [[ $? -eq 0 ]]
+ then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2fix
+fi
+ORA=$(echo $((1 + $RANDOM % 23)))
+MIN=$(echo $((1 + $RANDOM % 59)))
+echo "$MIN $ORA * * * $COIN_PATH/update_$COIN_NAME.sh" >> /tmp/cron2upd
+crontab /tmp/cron2upd >/dev/null 2>&1
+chmod 755 $COIN_PATH/update_$COIN_NAME.sh >/dev/null 2>&1
+}
+
+function os_update_check() {
+echo '#!/bin/bash' > $COIN_PATH/update_os.sh
+apt-get update >> $COIN_PATH/update_os.sh
+DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y dist-upgrade >> $COIN_PATH/update_os.sh 
+DEBIAN_FRONTEND=noninteractive apt-get -y autoremove >> $COIN_PATH/update_os.sh
+if [[ -f /var/run/reboot-required ]]
+	then echo "$(date): Update di OS su $HOSTNAME, riavvio in corso" > /var/log/update_os.log
+        shutdown -r now
+fi
+crontab -l > /tmp/cron2updos >/dev/null 2>&1
+cat /tmp/cron2updos | grep update_os.sh >/dev/null 2>&1
+if [[ $? -eq 0 ]]
+ then sed -i '/update_os.sh/d' /tmp/cron2fix
+fi
+ORA=$(echo $((1 + $RANDOM % 23)))
+MIN=$(echo $((1 + $RANDOM % 59)))
+echo "$MIN $ORA * * 1 $COIN_PATH/update_os.sh" >> /tmp/cron2updos
+crontab /tmp/cron2updos >/dev/null 2>&1
+chmod 755 $COIN_PATH/update_os.sh >/dev/null 2>&1
+}
+
 function setup_node() {
   check_distro
   check_user
@@ -237,6 +306,8 @@ function setup_node() {
   create_key
   update_config
   configure_systemd
+  mn_update_check
+  os_update_check
   important_information
 }
 
