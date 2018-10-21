@@ -309,7 +309,7 @@ if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" ]];  then
 	fi
 fi
 EOF
-crontab -l > /tmp/cron2upd >/dev/null 2>&1
+crontab -l > /tmp/cron2upd
 cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
  then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2upd
