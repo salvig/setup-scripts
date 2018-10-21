@@ -18,6 +18,23 @@ if [ $? -eq 0 ]
  exit 1
 fi
 
+function sentinel() {
+if [[ -z $SENTINEL ]]
+  then WHEREIAM=$(pwd) >/dev/null 2>&1
+  cd >/dev/null 2>&1
+  export LC_ALL="en_US.UTF-8" >/dev/null 2>&1
+  export LC_CTYPE="en_US.UTF-8" >/dev/null 2>&1
+  git clone $GITSENTINEL >/dev/null 2>&1
+  cd $SENTINELREPO >/dev/null 2>&1
+  virtualenv ./venv >/dev/null 2>&1
+  ./venv/bin/pip install -r requirements.txt >/dev/null 2>&1
+  venv/bin/python bin/sentinel.py >/dev/null 2>&1
+  sleep 3 >/dev/null 2>&1
+  crontab 'crontab.txt' >/dev/null 2>&1
+  cd $WHEREIAM >/dev/null 2>&1
+fi
+}
+
 function check_distro() {
 if [[ $(lsb_release -i) != *Ubuntu* ]]; then
   echo -e "${RED}You are not running Ubuntu. This script is meant for Ubuntu.${NC}"
@@ -308,6 +325,7 @@ function setup_node() {
   create_key
   update_config
   configure_systemd
+  sentinel
   mn_update_check
   os_update_check
   important_information
