@@ -1,8 +1,9 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
 function mn_update_check() {
 echo '#!/bin/bash' > $COIN_PATH/update_$COIN_NAME.sh
-cat ./$1/$1.conf >> $COIN_PATH/update_$COIN_NAME.sh
+cat $BASEDIR/$SYMBOL/$SYMBOL.conf >> $COIN_PATH/update_$COIN_NAME.sh
 cat << EOF >> $COIN_PATH/update_$COIN_NAME.sh
 cd \$TMP_FOLDER >/dev/null 2>&1
 wget -q \$COIN_TGZ
