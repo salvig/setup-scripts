@@ -256,15 +256,34 @@ if [[ \$? -ne 0 ]]; then
    exit 1
 fi
 if [[ -f \$COIN_PATH\$COIN_DAEMON ]]; then
-	unzip -j \$COIN_ZIP *\$COIN_DAEMON >/dev/null 2>&1
+	case \$COIN_ZIP in
+		*.tar.gz*)
+			tar xzvf \$COIN_ZIP
+			;;
+		*.zip*)
+	    		unzip -j \$COIN_ZIP *\$COIN_DAEMON >/dev/null 2>&1
+			;;
+	esac
 	MD5SUMOLD=\$(md5sum \$COIN_PATH\$COIN_DAEMON | awk '{print $1}')
-	MD5SUMNEW=\$(md5sum \$COIN_DAEMON | awk '{print $1}')
+	MD5SUMNEW=\$(find . -name \$COIN_CLI | xargs md5sum \$COIN_DAEMON | awk '{print $1}')
 	pidof \$COIN_DAEMON
 	RC=\$?
 	if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" && "\$RC" -eq 0 ]]; then
+	case \$COIN_ZIP in
+		*.tar.gz*)
+			find . -name \$COIN_DAEMON | xargs mv -t \$COIN_PATH >/dev/null 2>&1
+			find . -name \$COIN_CLI | xargs mv -t \$COIN_PATH >/dev/null 2>&1
+			chmod +x \$COIN_PATH\$COIN_DAEMON \$COIN_PATH\$COIN_CLI
+			;;
+		*.zip*)
+	    		unzip -o -j \$COIN_ZIP *\$COIN_DAEMON *\$COIN_CLI -d \$COIN_PATH >/dev/null 2>&1
+			chmod +x \$COIN_PATH\$COIN_DAEMON \$COIN_PATH\$COIN_CLI
+			;;
+	esac
 		echo -e "Stop running instances"
-		for service in \$(systemctl | grep \$COIN_NAME | awk '{ print $1 }')
-		do systemctl stop \$service >/dev/null 2>&1
+		declare services+=$(systemctl | grep \$COIN_NAME | awk '{ print $1 }')
+			for service in $services
+			do systemctl stop \$service >/dev/null 2>&1
 		done
 		sleep 3
 		RESTARTSYSD=Y
@@ -274,14 +293,14 @@ if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" ]];  then
 	unzip -o -j \$COIN_ZIP *\$COIN_DAEMON *\$COIN_CLI -d \$COIN_PATH >/dev/null 2>&1
 	chmod +x \$COIN_PATH\$COIN_DAEMON \$COIN_PATH\$COIN_CLI
 	if [[ "\$RESTARTSYSD" == "Y" ]]
-		then echo "\$(date) : Update di \$COIN su \$HOSTNAME verificare lo stato" > /var/log/update_demone.log
-		for service in \$(systemctl | grep \$COIN_NAME | awk '{ print $1 }')
+		then echo "\$(date) : Update di \$COIN_NAME su \$HOSTNAME verificare lo stato" > /var/log/update_demone.log
+		for service in $services
 		do systemctl start \$service >/dev/null 2>&1
 		done
 	fi
 fi
 EOF
-crontab -l > /tmp/cron2upd
+crontab -l > /tmp/cron2upd >/dev/null 2>&1
 cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
  then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2upd
