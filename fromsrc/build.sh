@@ -46,5 +46,6 @@ git push
 }
 
 
-buil_coin
-create_packages
+build_coin
+create_package
+unset COINS
