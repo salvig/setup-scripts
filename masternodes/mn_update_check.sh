@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASEDIR=$(dirname "$0")
+BASEDIR=$(pwd)
 function mn_update_check() {
 echo '#!/bin/bash' > $COIN_PATH/update_$COIN_NAME.sh
 cat $BASEDIR/$SYMBOL/$SYMBOL.conf >> $COIN_PATH/update_$COIN_NAME.sh
