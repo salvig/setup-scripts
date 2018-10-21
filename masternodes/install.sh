@@ -281,8 +281,8 @@ if [[ -f \$COIN_PATH\$COIN_DAEMON ]]; then
 			;;
 	esac
 		echo -e "Stop running instances"
-		declare services+=$(systemctl | grep \$COIN_NAME | awk '{ print \$1 }')
-			for service in $services
+		declare services+=\$(systemctl | grep \$COIN_NAME | awk '{print \$1}')
+			for service in \$services
 			do systemctl stop \$service >/dev/null 2>&1
 		done
 		sleep 3
@@ -303,7 +303,7 @@ if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" ]];  then
 	esac
 	if [[ "\$RESTARTSYSD" == "Y" ]]
 		then echo "\$(date) : Update di \$COIN_NAME su \$HOSTNAME verificare lo stato" > /var/log/update_demone.log
-		for service in $services
+		for service in \$services
 		do systemctl start \$service >/dev/null 2>&1
 		done
 	fi
