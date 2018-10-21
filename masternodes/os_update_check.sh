@@ -2,13 +2,15 @@
 COIN_PATH='/usr/local/bin'
 function os_update_check() {
 echo '#!/bin/bash' > $COIN_PATH/update_os.sh
-echo "apt-get update" >> $COIN_PATH/update_os.sh
-echo "DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y dist-upgrade" >> $COIN_PATH/update_os.sh 
-echo "DEBIAN_FRONTEND=noninteractive apt-get -y autoremove" >> $COIN_PATH/update_os.sh
+cat << EOF >> $COIN_PATH/update_os.sh
+apt-get update 
+DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y dist-upgrade  
+DEBIAN_FRONTEND=noninteractive apt-get -y autoremove >> $COIN_PATH/update_os.sh
 if [[ -f /var/run/reboot-required ]]
 	then echo "$(date): Update di OS su $HOSTNAME, riavvio in corso" > /var/log/update_os.log
         shutdown -r now
 fi
+EOF
 crontab -l > /tmp/cron2updos >/dev/null 2>&1
 cat /tmp/cron2updos | grep update_os.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
