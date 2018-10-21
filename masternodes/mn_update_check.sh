@@ -21,7 +21,7 @@ if [[ -f \$COIN_PATH\$COIN_DAEMON ]]; then
 			;;
 	esac
 	MD5SUMOLD=\$(md5sum \$COIN_PATH\$COIN_DAEMON | awk '{print \$1}')
-	MD5SUMNEW=\$(find . -name \$COIN_CLI | xargs md5sum \$COIN_DAEMON | awk '{print \$1}')
+	MD5SUMNEW=\$(find . -name \$COIN_DAEMON | xargs md5sum | awk '{print \$1}')
 	pidof \$COIN_DAEMON
 	RC=\$?
 	if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" && "\$RC" -eq 0 ]]; then
@@ -37,8 +37,8 @@ if [[ -f \$COIN_PATH\$COIN_DAEMON ]]; then
 			;;
 	esac
 		echo -e "Stop running instances"
-		declare services+=$(systemctl | grep \$COIN_NAME | awk '{ print \$1 }')
-			for service in $services
+		declare services+=\$(systemctl | grep \$COIN_NAME | awk '{ print \$1 }')
+			for service in \$services
 			do systemctl stop \$service >/dev/null 2>&1
 		done
 		sleep 3
@@ -59,13 +59,13 @@ if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" ]];  then
 	esac
 	if [[ "\$RESTARTSYSD" == "Y" ]]
 		then echo "\$(date) : Update di \$COIN_NAME su \$HOSTNAME verificare lo stato" > /var/log/update_demone.log
-		for service in $services
+		for service in \$services
 		do systemctl start \$service >/dev/null 2>&1
 		done
 	fi
 fi
 EOF
-crontab -l > /tmp/cron2upd >/dev/null 2>&1
+crontab -l > /tmp/cron2upd 
 cat /tmp/cron2upd | grep update_$COIN_NAME.sh >/dev/null 2>&1
 if [[ $? -eq 0 ]]
  then sed -i "/update_$COIN_NAME.sh/d" /tmp/cron2upd
