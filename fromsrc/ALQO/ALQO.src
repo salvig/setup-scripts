@@ -1,0 +1,2 @@
+GITHUB='://github.com/ALQOCRYPTO/ALQO.git'
+GITREPO=$(echo $GITHUB | awk -F'/' '{print $NF}'|cut -d "." -f1)
