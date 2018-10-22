@@ -29,13 +29,13 @@ if [[ -d depends ]]
 	make NO_QT=1
 	cd ..
 	./autogen.sh
-	CONFIG_SITE=$PWD/depends/x86_64-pc-linux-gnu/share/config.site ./configure --without-gui --disable-tests --prefix=$HOME/$COIN_NAME
+	CONFIG_SITE=$PWD/depends/x86_64-pc-linux-gnu/share/config.site ./configure --without-gui --disable-tests --prefix=$HOME/build/$COIN_NAME
 	make install-strip
 fi
 }
 
 create_package() {
-cd
+cd $HOME/build
 tar zcvf $COIN_NAME.tar.gz $COIN_NAME/
 mv $COIN_NAME.tar.gz $HOME/setup-scripts/fromsrc/$COIN_NAME
 cd $HOME/setup-scripts
