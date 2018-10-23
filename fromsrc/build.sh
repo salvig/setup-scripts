@@ -20,7 +20,7 @@ if [ $? -eq 0 ]
 fi
 
 build_coin() {
-cd
+cd $HOME/src
 git clone $GITHUB
 chmod -R 755 $GITREPO
 cd $GITREPO
