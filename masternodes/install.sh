@@ -10,6 +10,7 @@ GREEN="\033[0;32m"
 NC='\033[0m'
 MAG='\e[1;35m'
 
+export LC_ALL=en_US.UTF-8
 declare COINS+=$(ls -1d */ | cut -d "/" -f1)
 echo $COINS | grep $1 >/dev/null 2>&1
 if [ $? -eq 0 ]
@@ -212,44 +213,53 @@ netstat -napt | grep LISTEN | grep $NODEIP | grep $COIN_DAEMON >/dev/null 2>&1
 }
 
 function important_information() {
- clear
- echo
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${CYAN}$COIN_NAME linux  vps setup${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${GREEN}$COIN_NAME Masternode is up and running listening on port: ${NC}${RED}$COIN_PORT${NC}."
- echo -e "${GREEN}Configuration file is: ${NC}${RED}$CONFIGFOLDER/$CONFIG_FILE${NC}"
- echo -e "${GREEN}VPS_IP: ${NC}${RED}$NODEIP:$COIN_PORT${NC}"
- echo -e "${GREEN}MASTERNODE GENKEY is: ${NC}${RED}$COINKEY${NC}"
- echo -e "${BLUE}================================================================================================================================"
- echo -e "${CYAN}Stop, start and check your $COIN_NAME instance${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${PURPLE}Instance  start${NC}"
+clear
+echo
+echo -e "${BLUE}================================================================================================================================${NC}"
+echo -e "${CYAN}$COIN_NAME linux  vps setup${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+echo -e "${GREEN}$COIN_NAME Masternode is up and running listening on port: ${NC}${RED}$COIN_PORT${NC}."
+echo -e "${GREEN}Configuration file is: ${NC}${RED}$CONFIGFOLDER/$CONFIG_FILE${NC}"
+echo -e "${GREEN}VPS_IP: ${NC}${RED}$NODEIP:$COIN_PORT${NC}"
+if [[ "$SYMBOL" == "SMART" ]]
+ then echo -e "${GREEN}SMARTNODE GENKEY is: ${NC}${RED}$COINKEY${NC}"
+ else echo -e "${GREEN}MASTERNODE GENKEY is: ${NC}${RED}$COINKEY${NC}"
+fi
+echo -e "${BLUE}================================================================================================================================"
+echo -e "${CYAN}Stop, start and check your $COIN_NAME instance${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+echo -e "${PURPLE}Instance  start${NC}"
+echo -e "${GREEN}systemctl start $COIN_NAME.service${NC}"
+echo -e "${PURPLE}Instance  stop${NC}"
+echo -e "${GREEN}systemctl stop $COIN_NAME.service${NC}"
+echo -e "${PURPLE}Instance  check${NC}"
+echo -e "${GREEN}systemctl status $COIN_NAME.service${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+echo -e "${CYAN}Ensure Node is fully SYNCED with BLOCKCHAIN before start your masternode from hot wallet .${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+if [[ "$SYMBOL" == "SMART" ]]
+ then echo -e "${GREEN}$COIN_CLI snsync status${NC}"
+ else echo -e "${GREEN}$COIN_CLI mnsync status${NC}"
+fi
+echo -e "${YELLOW}It is expected this line: \"IsBlockchainSynced\": true ${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+echo -e "${CYAN}Check masternode status${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+if [[ "$SYMBOL" == "SMART" ]]
+ then echo -e "${GREEN}$COIN_CLI smartnode status${NC}"
+ else echo -e "${GREEN}$COIN_CLI masternode status${NC}"
+fi
+echo -e "${GREEN}$COIN_CLI getinfo${NC}"
+echo -e "${BLUE}================================================================================================================================${NC}"
+if [[ "$ERRSTATUS" == "TRUE" ]]; then
+ echo -e "${RED}$COIN_NAME seems not running, please investigate. Check its status by running the following commands as root:${NC}"
+ echo -e "systemctl status $COIN_NAME.service"
+ echo -e "${RED}You can restart it by firing following command (as root):${NC}"
  echo -e "${GREEN}systemctl start $COIN_NAME.service${NC}"
- echo -e "${PURPLE}Instance  stop${NC}"
- echo -e "${GREEN}systemctl stop $COIN_NAME.service${NC}"
- echo -e "${PURPLE}Instance  check${NC}"
- echo -e "${GREEN}systemctl status $COIN_NAME.service${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${CYAN}Ensure Node is fully SYNCED with BLOCKCHAIN before start your masternode from hot wallet .${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${GREEN}$COIN_CLI mnsync status${NC}"
- echo -e "${YELLOW}It is expected this line: \"IsBlockchainSynced\": true ${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${CYAN}Check masternode status${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- echo -e "${GREEN}$COIN_CLI masternode status${NC}"
- echo -e "${GREEN}$COIN_CLI getinfo${NC}"
- echo -e "${BLUE}================================================================================================================================${NC}"
- if [[ "$ERRSTATUS" == "TRUE" ]]; then
-    echo -e "${RED}$COIN_NAME seems not running, please investigate. Check its status by running the following commands as root:${NC}"
-    echo -e "systemctl status $COIN_NAME.service"
-    echo -e "${RED}You can restart it by firing following command (as root):${NC}"
-    echo -e "${GREEN}systemctl start $COIN_NAME.service${NC}"
-    echo -e "${RED}Check errors by runnig following commands:${NC}"
-    echo -e "${GREEN}less /var/log/syslog${NC}"
-    echo -e "${GREEN}journalctl -xe${NC}"
- fi
+ echo -e "${RED}Check errors by runnig following commands:${NC}"
+ echo -e "${GREEN}less /var/log/syslog${NC}"
+ echo -e "${GREEN}journalctl -xe${NC}"
+fi
 echo -e "Copy the info you need, then press any key to reboot"
 read -e tasto
 case $tasto in
@@ -279,7 +289,7 @@ if [[ -f \$COIN_PATH\$COIN_DAEMON ]]; then
 			;;
 	esac
 	MD5SUMOLD=\$(md5sum \$COIN_PATH\$COIN_DAEMON | awk '{print \$1}')
-	MD5SUMNEW=\$(find . -name \$COIN_CLI | xargs md5sum \$COIN_DAEMON | awk '{print \$1}')
+	MD5SUMNEW=\$(find . -name \$COIN_DAEMON | xargs md5sum | awk '{print \$1}')
 	pidof \$COIN_DAEMON
 	RC=\$?
 	if [[ "\$MD5SUMOLD" != "\$MD5SUMNEW" && "\$RC" -eq 0 ]]; then
