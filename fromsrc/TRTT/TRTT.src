@@ -1,0 +1,2 @@
+GITHUB='https://github.com/Trittium/trittium.git'
+GITREPO=$(echo $GITHUB | awk -F'/' '{print $NF}'|cut -d "." -f1)
