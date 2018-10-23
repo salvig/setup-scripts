@@ -137,7 +137,17 @@ if [ -z "$(ps axo cmd:100 | grep $COIN_DAEMON)" ]; then
  exit 1
 fi
 COUNT=0
-while [[ "$COUNT" -ne "20" ]]; do COINKEY=$($COIN_PATH$COIN_CLI masternode genkey)
+if [[ "$SYMBOL" == "SMART" ]]
+then while [[ "$COUNT" -ne "20" ]]; do COINKEY=$($COIN_PATH$COIN_CLI smartnode genkey)
+ if [ "$?" -gt "0" ];
+    then echo -e "${RED}Wallet not fully loaded. Let us wait and try again to generate the GEN Key${NC}"
+    sleep 20
+    let COUNT=${COUNT}+1
+    else COUNT=20
+ fi
+done
+$COIN_PATH$COIN_CLI stop >/dev/null 2>&1 
+else while [[ "$COUNT" -ne "20" ]]; do COINKEY=$($COIN_PATH$COIN_CLI masternode genkey)
  if [ "$?" -gt "0" ];
     then echo -e "${RED}Wallet not fully loaded. Let us wait and try again to generate the GEN Key${NC}"
     sleep 20
@@ -145,6 +155,7 @@ while [[ "$COUNT" -ne "20" ]]; do COINKEY=$($COIN_PATH$COIN_CLI masternode genke
     else COUNT=20
  fi
 done
+fi
 $COIN_PATH$COIN_CLI stop >/dev/null 2>&1
 }
 
@@ -164,6 +175,9 @@ masternode=1
 externalip=$NODEIP:$COIN_PORT
 masternodeprivkey=$COINKEY
 EOF
+if [[ "$SYMBOL" == "SMART" ]]
+then perl -i -pe 's/masternode/smartnode/g' $CONFIGFOLDER/$CONFIG_FILE
+fi
 }
 
 function configure_systemd() {
