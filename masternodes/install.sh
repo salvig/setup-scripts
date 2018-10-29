@@ -33,6 +33,10 @@ if [[ $SENTINEL == "Y" ]]
   ./venv/bin/pip install -r requirements.txt >/dev/null 2>&1
   venv/bin/python bin/sentinel.py >/dev/null 2>&1
   sleep 3 >/dev/null 2>&1
+  if [[ -e crontab.txt ]]
+   then continue
+   else echo -e "* * * * * cd ~/$SENTINELREPO && ./venv/bin/python bin/sentinel.py 2>&1 >> sentinel-cron.log" > crontab.txt
+  fi
   crontab -l >> crontab.txt
   crontab 'crontab.txt' >/dev/null 2>&1
   cd $WHEREIAM >/dev/null 2>&1
@@ -204,6 +208,7 @@ EOF
 
 systemctl daemon-reload
 systemctl enable $COIN_NAME$IP_SELECT.service >/dev/null 2>&1
+sleep 5
 systemctl start $COIN_NAME$IP_SELECT.service
 sleep 8
 netstat -napt | grep LISTEN | grep $NODEIP | grep $COIN_DAEMON >/dev/null 2>&1
