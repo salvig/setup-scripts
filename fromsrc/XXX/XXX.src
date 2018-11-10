@@ -1,2 +1,2 @@
-GITHUB='https://github.com/AdultChain/AdultChain.git'
+GITHUB='https://bitbucket.org/adultchain/adultchain.git'
 GITREPO=$(echo $GITHUB | awk -F'/' '{print $NF}'|cut -d "." -f1)
