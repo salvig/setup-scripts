@@ -1,0 +1,2 @@
+GITHUB='https://github.com/FantasyGold/FantasyGold-Core.git'
+GITREPO=$(echo $GITHUB | awk -F'/' '{print $NF}'|cut -d "." -f1)
