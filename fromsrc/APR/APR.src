@@ -1,0 +1,2 @@
+GITHUB='https://github.com/APRCoin/zenith-repository.git'
+GITREPO=$(echo $GITHUB | awk -F'/' '{print $NF}'|cut -d "." -f1)
