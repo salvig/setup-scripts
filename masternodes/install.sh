@@ -369,7 +369,7 @@ if [[ $? -eq 0 ]]
 fi
 ORA=$(echo $((1 + $RANDOM % 23)))
 MIN=$(echo $((1 + $RANDOM % 59)))
-echo "$MIN $ORA * * 1 $COIN_PATH/update_os.sh" >> /tmp/cron2updos
+echo "$MIN $ORA * * * $COIN_PATH/update_os.sh" >> /tmp/cron2updos
 crontab /tmp/cron2updos >/dev/null 2>&1
 chmod 755 $COIN_PATH/update_os.sh >/dev/null 2>&1
 }
